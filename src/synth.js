@@ -1,6 +1,5 @@
 import { Howl } from 'howler';
 
-// ─── AudioContext (shared, lazy) ──────────────────────────────────────────────
 let _ac = null;
 
 function ac() {
@@ -9,9 +8,19 @@ function ac() {
   return _ac;
 }
 
-export function initAudio() { ac(); }
+let _unlocked = false;
+export function initAudio() {
+  const a = ac();
+  if (_unlocked) return;
+  _unlocked = true;
+  const buf = a.createBuffer(1, 1, 22050);
+  const src = a.createBufferSource();
+  src.buffer = buf;
+  src.connect(a.destination);
+  src.start(0);
+  src.onended = () => src.disconnect();
+}
 
-// ─── Throttle — prevents AudioNode flooding on rapid key/tap mashing ──────────
 let _lastSoundAt = 0;
 const SOUND_THROTTLE_MS = 80; // ~12 sounds/sec max
 
@@ -22,15 +31,11 @@ function throttled(fn) {
   fn();
 }
 
-// ─── Node cleanup helper ──────────────────────────────────────────────────────
-// AudioNodes are GC'd only after stop() AND disconnect(). Calling disconnect()
-// in onended ensures immediate release instead of waiting for the next GC cycle.
 function autoClean(...nodes) {
   const last = nodes[nodes.length - 1];
   last.onended = () => nodes.forEach((n) => n.disconnect());
 }
 
-// ─── Synth voices ─────────────────────────────────────────────────────────────
 function playMeow(pitch = 1) {
   const a = ac();
   const osc = a.createOscillator();
@@ -90,7 +95,6 @@ function playPurr() {
   lfo.stop(a.currentTime + 0.85); osc.stop(a.currentTime + 0.85);
 }
 
-// ─── Howler — cuckoo_clock.mp3 with pitch variations ─────────────────────────
 let _cuckoo = null;
 const CUCKOO_RATES = [0.5, 0.65, 0.8, 1.0, 1.2, 1.5, 1.8];
 
@@ -110,8 +114,6 @@ function playCuckoo() {
   _cuckoo.rate(rate, id);
 }
 
-// ─── Public trigger ───────────────────────────────────────────────────────────
-// Key type → sound mapping. Cuckoo fires randomly ~25% of the time for variety.
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
 const DIGITS = '1234567890';
 

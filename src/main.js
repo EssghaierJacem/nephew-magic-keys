@@ -1,4 +1,4 @@
-import { startGame, clearBgCanvas } from './game.js';
+import { startGame, clearBgCanvas, triggerConfetti } from './game.js';
 import { LANDING_CATS } from './cats.js';
 
 function buildLanding() {
@@ -59,11 +59,12 @@ function launchGame() {
     tipBar.innerHTML = `
       <span>tap / keys → cats</span>
       <span>drag → rainbow</span>
-      <span>space → confetti</span>
+      <button id="confetti-btn" title="Confetti! (or double-tap)">confetti</button>
       <button id="clear-btn" title="Wipe canvas">🗑 clear</button>
     `;
     app.appendChild(tipBar);
 
+    document.getElementById('confetti-btn').addEventListener('click', triggerConfetti);
     document.getElementById('clear-btn').addEventListener('click', clearBgCanvas);
 
     startGame(app);

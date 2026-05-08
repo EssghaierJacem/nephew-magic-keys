@@ -41,18 +41,30 @@ html, body {
 
 #tip-bar span { white-space: nowrap; }
 
+#confetti-btn,
 #clear-btn {
-  margin-left: auto;
   padding: 0.3rem 0.75rem;
   min-height: 36px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.55);
   font-size: 0.78rem;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+#confetti-btn {
+  background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(219,39,119,0.35));
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+}
+#confetti-btn:hover  { background: linear-gradient(135deg, rgba(124,58,237,0.55), rgba(219,39,119,0.55)); color: #fff; }
+#confetti-btn:active { transform: scale(0.95); }
+
+#clear-btn {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.55);
 }
 #clear-btn:hover  { background: rgba(255,255,255,0.15); color: #fff; }
 #clear-btn:active { background: rgba(255,255,255,0.22); }

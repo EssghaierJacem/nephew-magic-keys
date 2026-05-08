@@ -2,9 +2,8 @@ import p5 from 'p5';
 import { CATS, MAX_CATS, BG_COLOR } from './config.js';
 import { initAudio, loadSounds, triggerSound } from './synth.js';
 
-// ─── Permanent paint layer (native Canvas 2D) ─────────────────────────────────
-// Written to only when the user actively paints — never blitted per frame.
-// The p5 fg-canvas sits on top and calls p.clear() each frame (cheap GPU op).
+let _fireConfetti = null;
+export function triggerConfetti() { _fireConfetti?.(); }
 
 let bgCanvas = null;
 let bgCtx = null;
@@ -95,8 +94,10 @@ export function startGame(container) {
     let hue = 0;
     const cats = [];
     const heldKeys = new Set();
-    let lastCatAt = 0;       // spawn rate-limiter
-    let lastPaintAt = 0;     // held-key paint throttle
+    let lastCatAt = 0;
+    let lastPaintAt = 0;
+    let lastTapAt = 0;
+    let isMouseDown = false; // own flag — p.mouseIsPressed can get stuck if mouseup fires outside the window
 
     function spawnCat(x, y) {
       const now = performance.now();
@@ -110,12 +111,22 @@ export function startGame(container) {
       cnv.parent(container);
       cnv.elt.id = 'fg-canvas';
       p.clear();
+
+      // Safety net: reset flag whenever the mouse button comes up anywhere,
+      // even outside the browser window (e.g. alt-tab while held, or browser
+      // busy with audio and the in-canvas mouseReleased fires late / not at all).
+      const resetMouse = () => { isMouseDown = false; };
+      window.addEventListener('mouseup', resetMouse, { passive: true });
+      window.addEventListener('blur',    resetMouse, { passive: true });
     };
+
+    p.mousePressed  = () => { if (p.touches.length === 0) isMouseDown = true; };
+    p.mouseReleased = () => { isMouseDown = false; };
 
     p.draw = () => {
       p.clear();
 
-      if (p.mouseIsPressed) {
+      if (isMouseDown) {
         paintDots(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY, 28, hue);
       }
 
@@ -161,6 +172,17 @@ export function startGame(container) {
     // ── Touch (mobile) ────────────────────────────────────────────────────────
     p.touchStarted = () => {
       initAudio();
+
+      const now = performance.now();
+      const isDoubleTap = now - lastTapAt < 300 && p.touches.length === 1;
+      lastTapAt = now;
+
+      if (isDoubleTap) {
+        fireConfetti(hue);
+        lastTapAt = 0;
+        return false;
+      }
+
       for (const t of p.touches) {
         triggerSound(p.random(['a', 'e', 'i', 'o', '1', '2', '3']));
         spawnCat(t.x, t.y);
@@ -175,7 +197,7 @@ export function startGame(container) {
       return false;
     };
 
-    // ── Confetti burst (Space / double-tap) ───────────────────────────────────
+    // ── Confetti burst (Space / double-tap / button) ──────────────────────────
     function fireConfetti(h) {
       for (let i = 0; i < 32; i++) {
         bgCtx.fillStyle = `hsla(${(h + i * 11) % 360},90%,65%,0.68)`;
@@ -188,6 +210,9 @@ export function startGame(container) {
         bgCtx.fill();
       }
     }
+
+    // Wire the external button / double-tap after fireConfetti is defined
+    _fireConfetti = () => fireConfetti(hue);
 
     p.windowResized = () => {
       p.resizeCanvas(p.windowWidth, p.windowHeight);

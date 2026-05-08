@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(Get-ChildItem D:\\\\nephew-magic-keys -File | Where-Object { $_.Name -ne '.gitignore' } | Select-Object Name)",
-      "PowerShell(cmd /c \"dir /a-d D:\\\\nephew-magic-keys\")"
-    ]
-  }
-}
