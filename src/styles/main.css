@@ -1,0 +1,161 @@
+/* ─── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #18122b;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  position: relative;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Canvas layers ───────────────────────────────────────────────────────── */
+#bg-canvas, #fg-canvas {
+  position: absolute; top: 0; left: 0;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+#bg-canvas { z-index: 1; }
+#fg-canvas  { z-index: 2; }
+
+/* ─── In-game tip bar ─────────────────────────────────────────────────────── */
+#tip-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex; align-items: center; gap: 1.2rem;
+  padding: 0.5rem 1.2rem;
+  background: rgba(8, 4, 22, 0.72);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  user-select: none;
+}
+
+#tip-bar span { white-space: nowrap; }
+
+#clear-btn {
+  margin-left: auto;
+  padding: 0.3rem 0.75rem;
+  min-height: 36px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+#clear-btn:hover  { background: rgba(255,255,255,0.15); color: #fff; }
+#clear-btn:active { background: rgba(255,255,255,0.22); }
+
+/* ─── Landing ─────────────────────────────────────────────────────────────── */
+#landing {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 38%, #2d1270 0%, #0c0818 100%);
+  transition: opacity 0.4s ease;
+  padding: 1rem;
+}
+#landing.fade-out { opacity: 0; pointer-events: none; }
+
+.landing-card {
+  text-align: center;
+  padding: 2rem 2.2rem 2.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  backdrop-filter: blur(14px);
+  max-width: 420px;
+  width: 100%;
+}
+
+/* ─── Animated SVG cats ───────────────────────────────────────────────────── */
+.cat-hero {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 1rem; margin-bottom: 1.4rem;
+}
+
+.cat-float svg { width: 64px; height: auto; display: block; }
+
+@keyframes cat-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%       { transform: translateY(-10px) rotate(2deg); }
+}
+
+.cat-float          { animation: cat-float 3s ease-in-out infinite; }
+.cat-float--1       { animation-delay: 0s; }
+.cat-float--2       { animation-delay: -1.1s; transform-origin: center bottom; }
+.cat-float--3       { animation-delay: -2.2s; }
+
+/* ─── Landing typography ──────────────────────────────────────────────────── */
+.landing-card h1 {
+  font-size: 1.75rem; font-weight: 700;
+  color: #fff; margin-bottom: 0.3rem;
+}
+
+.landing-sub {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 1.4rem;
+}
+
+/* ─── Tip list ────────────────────────────────────────────────────────────── */
+.tip-list {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.6rem;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 0.55rem;
+}
+
+.tip-item {
+  display: flex; align-items: center; gap: 0.65rem;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.tip-dot {
+  width: 7px; height: 7px; flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f472b6, #a78bfa);
+}
+
+/* ─── Play button ─────────────────────────────────────────────────────────── */
+.play-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%;
+  padding: 0.95rem 2rem;
+  min-height: 54px;        /* large enough for mobile touch targets */
+  font-size: 1.15rem; font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+  border: none; border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.play-btn:hover  { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 32px rgba(124,58,237,0.6); }
+.play-btn:active { transform: translateY(0) scale(0.97); }
+
+/* ─── Mobile ──────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .landing-card { padding: 1.5rem 1.2rem 1.8rem; border-radius: 18px; }
+  .landing-card h1 { font-size: 1.4rem; }
+  .cat-float svg { width: 52px; }
+  .cat-hero { gap: 0.7rem; }
+  .play-btn { font-size: 1.05rem; min-height: 50px; }
+  #tip-bar { font-size: 0.72rem; gap: 0.8rem; padding: 0.45rem 0.8rem; }
+}
