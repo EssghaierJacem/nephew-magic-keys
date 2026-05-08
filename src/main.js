@@ -1,5 +1,6 @@
 import { startGame, clearBgCanvas, triggerConfetti } from './game.js';
 import { LANDING_CATS } from './cats.js';
+import { initAudio, loadSounds } from './synth.js';
 
 function buildLanding() {
   const app = document.getElementById('app');
@@ -42,7 +43,13 @@ function buildLanding() {
     </div>
   `;
 
-  document.getElementById('play-btn').addEventListener('click', launchGame);
+  document.getElementById('play-btn').addEventListener('click', () => {
+    // iOS Safari honours 'click' for AudioContext unlock — 'touchstart' does not.
+    // Both calls must happen here, synchronously, while the click gesture is active.
+    loadSounds(); // creates Howler's AudioContext
+    initAudio();  // unlocks our synth context + Howler's context
+    launchGame();
+  });
 }
 
 function launchGame() {

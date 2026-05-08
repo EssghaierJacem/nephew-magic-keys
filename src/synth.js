@@ -1,4 +1,4 @@
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 
 let _ac = null;
 
@@ -8,17 +8,28 @@ function ac() {
   return _ac;
 }
 
+// ─── iOS audio unlock ─────────────────────────────────────────────────────────
+// iOS Safari only unlocks AudioContext on 'click' or 'touchend', NOT on
+// 'touchstart'. Call initAudio() from the Play button's click handler so both
+// contexts are running well before the user's first tap on the canvas.
 let _unlocked = false;
 export function initAudio() {
-  const a = ac();
   if (_unlocked) return;
   _unlocked = true;
+
+  // Unlock our Web Audio synth context with a silent buffer
+  const a = ac();
   const buf = a.createBuffer(1, 1, 22050);
   const src = a.createBufferSource();
   src.buffer = buf;
   src.connect(a.destination);
   src.start(0);
   src.onended = () => src.disconnect();
+
+  // Unlock Howler's AudioContext too — it's a separate instance
+  if (Howler.ctx && Howler.ctx.state !== 'running') {
+    Howler.ctx.resume().catch(() => {});
+  }
 }
 
 let _lastSoundAt = 0;
